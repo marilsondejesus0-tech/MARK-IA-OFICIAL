@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARK IA - Consultor de Marketing</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #0a0a0a;
+      color: #ffffff;
+      text-align: center;
+      padding: 40px;
+    }
+    h1 {
+      color: #00aaff;
+      font-size: 2rem;
+    }
+    #chat-container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #1a1a1a;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 0 15px rgba(0, 170, 255, 0.2);
+    }
+    textarea {
+      width: 100%;
+      height: 100px;
+      border-radius: 8px;
+      padding: 10px;
+      border: none;
+      resize: none;
+      font-size: 1rem;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #00aaff;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #0088cc;
+    }
+    #response {
+      margin-top: 25px;
+      padding: 15px;
+      background-color: #111;
+      border-radius: 10px;
+      text-align: left;
+      white-space: pre-wrap;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <h1>🤖 MARK IA - Consultor de Marketing</h1>
+  <div id="chat-container">
+    <textarea id="user-input" placeholder="Digite sua dúvida sobre marketing, redes sociais ou vendas..."></textarea>
+    <button onclick="sendMessage()">Enviar</button>
+    <div id="response"></div>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const userInput = document.getElementById('user-input').value;
+      const responseDiv = document.getElementById('response');
+      if (!userInput.trim()) return;
+
+      responseDiv.innerHTML = "⏳ Gerando resposta...";
+
+      try {
+        const res = await fetch("https://api-inference.huggingface.co/models/facebook/blenderbot-400M-distill", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ inputs: userInput })
+        });
+
+        if (!res.ok) {
+          throw new Error("Erro ao acessar a IA gratuita. Tente novamente mais tarde.");
+        }
+
+        const data = await res.json();
+        if (data && data[0] && data[0].generated_text) {
+          responseDiv.innerHTML = "💬 " + data[0].generated_text;
+        } else {
+          responseDiv.innerHTML = "⚠️ A IA não conseguiu gerar uma resposta.";
+        }
+      } catch (err) {
+        responseDiv.innerHTML = "❌ Erro: " + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
